@@ -10,7 +10,8 @@ postRouter.use(auth);
 
 postRouter.get("/", async (req, res) => {
   try {
-    const posts = await PostModel.find({ userID: req.body.userID });
+    const { userID } = req.query;
+    const posts = await PostModel.find({ userID });
     res.json(posts);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -21,7 +22,17 @@ postRouter.get("/", async (req, res) => {
 
 postRouter.post("/add", async (req, res) => {
   try {
-    const post = new PostModel(req.body);
+    const userId = req.user._id;
+    const { title, body, device } = req.body;
+    if (!title || !body || !device) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+    const post = new PostModel({
+      title,
+      body,
+      device,
+      userID: userId,
+    });
     await post.save();
     res.status(200).json({ message: "Post Created successfully." });
   } catch (error) {
@@ -77,5 +88,5 @@ postRouter.delete("/:postId", async (req, res) => {
 });
 
 module.exports = {
-  postRouter
+  postRouter,
 };
