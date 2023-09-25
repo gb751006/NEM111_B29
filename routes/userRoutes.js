@@ -42,8 +42,8 @@ userRouter.post("/login", async (req, res) => {
   try {
     const user = await UserModel.findOne({ email });
     if (user) {
-      bcrypt.compare(password, user.password, (err, res) => {
-        if (res) {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (result) {
           let token = jwt.sign({ userID: user._id, user: user.name }, "TOKEN", {
             expiresIn: "7d",
           });
